@@ -47,11 +47,11 @@
 				<false/>
 			</dict>
 		</array>
-		<key>44B41D81-BE8A-403A-BFDD-611E39AB3A2F</key>
+		<key>2CA03534-E2DF-4939-A1B9-1E5B4F6AE96A</key>
 		<array>
 			<dict>
 				<key>destinationuid</key>
-				<string>1E7A4A43-555B-4118-9DCA-45E10DD07B74</string>
+				<string>281994A2-068C-4F76-B535-D0C5DC79A00E</string>
 				<key>modifiers</key>
 				<integer>0</integer>
 				<key>modifiersubtext</key>
@@ -60,11 +60,11 @@
 				<false/>
 			</dict>
 		</array>
-		<key>811C2820-1695-480B-BE79-A574F6E4B634</key>
+		<key>44B41D81-BE8A-403A-BFDD-611E39AB3A2F</key>
 		<array>
 			<dict>
 				<key>destinationuid</key>
-				<string>281994A2-068C-4F76-B535-D0C5DC79A00E</string>
+				<string>1E7A4A43-555B-4118-9DCA-45E10DD07B74</string>
 				<key>modifiers</key>
 				<integer>0</integer>
 				<key>modifiersubtext</key>
@@ -86,6 +86,32 @@
 				<false/>
 			</dict>
 		</array>
+		<key>A28BD2D6-CA4F-4C66-A258-92A56A917C57</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>281994A2-068C-4F76-B535-D0C5DC79A00E</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
+		<key>D6C4695C-7A25-4BAB-90E4-A51F7CCBBD43</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>281994A2-068C-4F76-B535-D0C5DC79A00E</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
 	</dict>
 	<key>createdby</key>
 	<string>Dino Paskvan</string>
@@ -97,6 +123,37 @@
 	<string>Getflix</string>
 	<key>objects</key>
 	<array>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>action</key>
+				<integer>0</integer>
+				<key>argument</key>
+				<integer>0</integer>
+				<key>focusedappvariable</key>
+				<false/>
+				<key>focusedappvariablename</key>
+				<string></string>
+				<key>hotkey</key>
+				<integer>0</integer>
+				<key>hotmod</key>
+				<integer>0</integer>
+				<key>hotstring</key>
+				<string></string>
+				<key>leftcursor</key>
+				<false/>
+				<key>modsmode</key>
+				<integer>0</integer>
+				<key>relatedAppsMode</key>
+				<integer>0</integer>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.trigger.hotkey</string>
+			<key>uid</key>
+			<string>A28BD2D6-CA4F-4C66-A258-92A56A917C57</string>
+			<key>version</key>
+			<integer>2</integer>
+		</dict>
 		<dict>
 			<key>config</key>
 			<dict>
@@ -158,23 +215,88 @@ print "Done."</string>
 		<dict>
 			<key>config</key>
 			<dict>
+				<key>argument</key>
+				<string></string>
+				<key>argumenttype</key>
+				<integer>0</integer>
+				<key>triggerid</key>
+				<string>Getflix</string>
+				<key>triggername</key>
+				<string>Getflix IP</string>
+				<key>workflowonly</key>
+				<false/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.trigger.remote</string>
+			<key>uid</key>
+			<string>2CA03534-E2DF-4939-A1B9-1E5B4F6AE96A</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>alfredfiltersresults</key>
+				<false/>
 				<key>argumenttype</key>
 				<integer>2</integer>
+				<key>escaping</key>
+				<integer>102</integer>
 				<key>keyword</key>
 				<string>getflix ip</string>
-				<key>subtext</key>
+				<key>queuedelaycustom</key>
+				<integer>3</integer>
+				<key>queuedelayimmediatelyinitially</key>
+				<true/>
+				<key>queuedelaymode</key>
+				<integer>0</integer>
+				<key>queuemode</key>
+				<integer>1</integer>
+				<key>runningsubtext</key>
+				<string>Checking...</string>
+				<key>script</key>
+				<string>require "net/http"
+require "uri"
+require 'json'
+
+uri = URI.parse("https://www.getflix.com.au/api/v1/addresses.json")
+ip_uri = URI.parse("https://api.ipify.org")
+apikey = ENV['apikey']
+
+current_ip = Net::HTTP.get(ip_uri)
+
+request = Net::HTTP::Get.new(uri.request_uri)
+request.basic_auth apikey, 'x'
+
+response = Net::HTTP.start(uri.hostname, uri.port, :use_ssl =&gt; uri.scheme == 'https') {|http|
+  http.request(request)
+}
+parsed_response = JSON.parse(response.body)
+
+if parsed_response[0]["ip_address"] == current_ip
+  print JSON.generate({:items =&gt; [{:title =&gt; "IP is up to date.", :subtitle =&gt; "You don't need to update your IP."}]})
+else
+  print JSON.generate({:items =&gt; [{:title =&gt; "IP is not up to date.", :subtitle =&gt; "You need to update your IP."}]})
+end</string>
+				<key>scriptargtype</key>
+				<integer>1</integer>
+				<key>scriptfile</key>
 				<string></string>
-				<key>text</key>
-				<string>Update your IP Address with Getflix</string>
+				<key>subtext</key>
+				<string>Update your IP address with Getflix</string>
+				<key>title</key>
+				<string>Getflix IP Update</string>
+				<key>type</key>
+				<integer>2</integer>
 				<key>withspace</key>
 				<false/>
 			</dict>
 			<key>type</key>
-			<string>alfred.workflow.input.keyword</string>
+			<string>alfred.workflow.input.scriptfilter</string>
 			<key>uid</key>
-			<string>811C2820-1695-480B-BE79-A574F6E4B634</string>
+			<string>D6C4695C-7A25-4BAB-90E4-A51F7CCBBD43</string>
 			<key>version</key>
-			<integer>1</integer>
+			<integer>2</integer>
 		</dict>
 		<dict>
 			<key>config</key>
@@ -194,6 +316,27 @@ print "Done."</string>
 			<string>alfred.workflow.output.notification</string>
 			<key>uid</key>
 			<string>58CEECE6-F892-426D-8D46-36FA8434F687</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>argumenttype</key>
+				<integer>2</integer>
+				<key>keyword</key>
+				<string>getflix dns</string>
+				<key>subtext</key>
+				<string>Check if your DNS is configured with Getflix</string>
+				<key>text</key>
+				<string>Getflix DNS Check</string>
+				<key>withspace</key>
+				<false/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.input.keyword</string>
+			<key>uid</key>
+			<string>44B41D81-BE8A-403A-BFDD-611E39AB3A2F</string>
 			<key>version</key>
 			<integer>1</integer>
 		</dict>
@@ -232,27 +375,6 @@ end</string>
 			<string>1E7A4A43-555B-4118-9DCA-45E10DD07B74</string>
 			<key>version</key>
 			<integer>2</integer>
-		</dict>
-		<dict>
-			<key>config</key>
-			<dict>
-				<key>argumenttype</key>
-				<integer>2</integer>
-				<key>keyword</key>
-				<string>getflix dns</string>
-				<key>subtext</key>
-				<string>Check if your DNS is configured with Getflix</string>
-				<key>text</key>
-				<string>Getflix DNS Check</string>
-				<key>withspace</key>
-				<false/>
-			</dict>
-			<key>type</key>
-			<string>alfred.workflow.input.keyword</string>
-			<key>uid</key>
-			<string>44B41D81-BE8A-403A-BFDD-611E39AB3A2F</string>
-			<key>version</key>
-			<integer>1</integer>
 		</dict>
 		<dict>
 			<key>config</key>
@@ -344,65 +466,79 @@ You can find your API key here: https://www.getflix.com.au/manage/apps</string>
 		<key>1E7A4A43-555B-4118-9DCA-45E10DD07B74</key>
 		<dict>
 			<key>xpos</key>
-			<integer>370</integer>
+			<integer>360</integer>
 			<key>ypos</key>
-			<integer>230</integer>
+			<integer>350</integer>
 		</dict>
 		<key>20EFCC24-9AA0-434D-A9D5-609CA5357552</key>
 		<dict>
 			<key>xpos</key>
 			<integer>150</integer>
 			<key>ypos</key>
-			<integer>340</integer>
+			<integer>460</integer>
 		</dict>
 		<key>281994A2-068C-4F76-B535-D0C5DC79A00E</key>
 		<dict>
 			<key>xpos</key>
-			<integer>370</integer>
+			<integer>360</integer>
 			<key>ypos</key>
-			<integer>120</integer>
+			<integer>130</integer>
+		</dict>
+		<key>2CA03534-E2DF-4939-A1B9-1E5B4F6AE96A</key>
+		<dict>
+			<key>xpos</key>
+			<integer>150</integer>
+			<key>ypos</key>
+			<integer>130</integer>
 		</dict>
 		<key>44B41D81-BE8A-403A-BFDD-611E39AB3A2F</key>
 		<dict>
 			<key>xpos</key>
 			<integer>150</integer>
 			<key>ypos</key>
-			<integer>230</integer>
+			<integer>350</integer>
 		</dict>
 		<key>58CEECE6-F892-426D-8D46-36FA8434F687</key>
 		<dict>
 			<key>xpos</key>
 			<integer>560</integer>
 			<key>ypos</key>
-			<integer>230</integer>
-		</dict>
-		<key>811C2820-1695-480B-BE79-A574F6E4B634</key>
-		<dict>
-			<key>xpos</key>
-			<integer>150</integer>
-			<key>ypos</key>
-			<integer>120</integer>
+			<integer>350</integer>
 		</dict>
 		<key>82A2D39C-1DBC-4836-BE2A-0C19EFCA5748</key>
 		<dict>
 			<key>xpos</key>
-			<integer>370</integer>
+			<integer>360</integer>
 			<key>ypos</key>
-			<integer>340</integer>
+			<integer>460</integer>
 		</dict>
 		<key>A19751D2-2F79-4809-973D-0E6EAC3789EF</key>
 		<dict>
 			<key>xpos</key>
 			<integer>560</integer>
 			<key>ypos</key>
-			<integer>120</integer>
+			<integer>130</integer>
+		</dict>
+		<key>A28BD2D6-CA4F-4C66-A258-92A56A917C57</key>
+		<dict>
+			<key>xpos</key>
+			<integer>150</integer>
+			<key>ypos</key>
+			<integer>20</integer>
 		</dict>
 		<key>BF82B893-A660-4F0A-9E91-68B3F2E39BA2</key>
 		<dict>
 			<key>xpos</key>
 			<integer>560</integer>
 			<key>ypos</key>
-			<integer>340</integer>
+			<integer>460</integer>
+		</dict>
+		<key>D6C4695C-7A25-4BAB-90E4-A51F7CCBBD43</key>
+		<dict>
+			<key>xpos</key>
+			<integer>150</integer>
+			<key>ypos</key>
+			<integer>240</integer>
 		</dict>
 	</dict>
 	<key>variables</key>
@@ -415,7 +551,7 @@ You can find your API key here: https://www.getflix.com.au/manage/apps</string>
 		<string>apikey</string>
 	</array>
 	<key>version</key>
-	<string>1.0.0</string>
+	<string>1.1.0</string>
 	<key>webaddress</key>
 	<string>http://www.dinopaskvan.com</string>
 </dict>
